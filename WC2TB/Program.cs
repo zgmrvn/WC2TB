@@ -41,6 +41,9 @@ namespace WC2TB
 
             // Process objects data.
             ExportObjects(ref xml);
+
+            Console.WriteLine("Press ENTER to exit.");
+            Console.ReadLine();
         }
 
         #endregion
@@ -115,9 +118,6 @@ namespace WC2TB
                     }
                 }
             }
-
-            Console.WriteLine("Press ENTER to exit.");
-            Console.ReadLine();
         }
 
         #endregion
