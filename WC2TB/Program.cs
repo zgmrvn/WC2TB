@@ -16,7 +16,6 @@ namespace WC2TB
 
         private static string Directory;
 
-
         static void Main(string[] args)
         {
             // If no file was dragged onto exe, exit.
