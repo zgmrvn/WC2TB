@@ -16,6 +16,8 @@ namespace WC2TB
 
         private static string Directory;
 
+        #region Main
+
         static void Main(string[] args)
         {
             // If no file was dragged onto exe, exit.
@@ -40,6 +42,10 @@ namespace WC2TB
             // Process objects data.
             ExportObjects(ref xml);
         }
+
+        #endregion
+
+        #region Export
 
         /**
          * Processes World Creator's projet and exports data
@@ -82,7 +88,7 @@ namespace WC2TB
                             for (int i = 0; i < dataCount; i++)
                             {
                                 int off = i * elementCount;
-          
+
                                 // Extract object's data.
                                 var x = (objectData[off] + TBOffset).ToString(CultureInfo.InvariantCulture);
                                 var y = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
@@ -113,5 +119,7 @@ namespace WC2TB
             Console.WriteLine("Press ENTER to exit.");
             Console.ReadLine();
         }
+
+        #endregion
     }
 }
