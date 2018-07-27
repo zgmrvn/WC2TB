@@ -48,7 +48,7 @@ namespace WC2TB
 
         #endregion
 
-        #region Export
+        #region Export objects
 
         /**
          * Processes World Creator's projet and exports data
