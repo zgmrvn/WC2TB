@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Numerics;
 using System.Xml;
+using Extensions;
 
 namespace WC2TB
 {
@@ -92,25 +94,21 @@ namespace WC2TB
                             {
                                 int off = i * elementCount;
 
-                                // Extract object's data.
-                                var x = (objectData[off] + TBOffset).ToString(CultureInfo.InvariantCulture);
-                                var y = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
-                                var z = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
-                                var yaw = 0.ToString(CultureInfo.InvariantCulture);
-                                var pitch = 0.ToString(CultureInfo.InvariantCulture);
-                                var roll = 0.ToString(CultureInfo.InvariantCulture);
-                                var scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
+                                // Extract rotation.
+                                var quaternion = new Quaternion(objectData[off + 5], objectData[off + 6], objectData[off + 7], objectData[off + 8]);
+                                Vector3 euler = quaternion.Euler();
 
-                                /*
-                                var quat = new Quaternion(objectData[off + 5],
-                                  objectData[off + 6], objectData[off + 7], objectData[off + 8]);
-                                instance.rotation = quat.eulerAngles.y;
-                                instance.prototypeIndex = index;
-                                terrainComponent.AddTreeInstance(instance);
-                                */
+                                // Prepare final data.
+                                string posX = (objectData[off] + TBOffset).ToString(CultureInfo.InvariantCulture);
+                                string posY = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
+                                string posZ = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
+                                string rotY = euler.Y.ToString(CultureInfo.InvariantCulture);
+                                string rotX = euler.X.ToString(CultureInfo.InvariantCulture);
+                                string rotZ = euler.Z.ToString(CultureInfo.InvariantCulture);
+                                string scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
 
-                                // model, x, y, yaw, pitch, roll, scale, z
-                                string entry = $"\"{tag}\";{x};{y};{yaw};{pitch};{roll};{scale};{z};";
+                                // model, x, y, yaw (x), pitch (y), roll (z), scale, z
+                                string entry = $"\"{tag}\";{posX};{posY};{rotY};{rotX};{rotZ};{scale};{posZ};";
 
                                 file.WriteLine(entry);
                             }
