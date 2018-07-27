@@ -59,11 +59,13 @@ namespace WC2TB
             XmlNode objects = objectElements[0];
             XmlNode layers = objects.ChildNodes[0];
 
+            // objects count
+            int totalObjectsCount = 0;
+            int layerObjectsCount = 0;
+
             // Iterate throught layers.
             foreach (XmlElement layer in layers)
             {
-                Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported");
-
                 // Open a file stream per World Creator layer.
                 string path = Directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
 
@@ -107,11 +109,20 @@ namespace WC2TB
                                 string entry = $"\"{tag}\";{posX};{posY};{rotY};{rotX};{rotZ};{scale};{posZ};";
 
                                 file.WriteLine(entry);
+                                layerObjectsCount++;
                             }
                         }
                     }
                 }
+
+                // Display layer's objects count.
+                Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported : " + layerObjectsCount + " object(s).");
+                totalObjectsCount += layerObjectsCount;
+                layerObjectsCount = 0;
             }
+
+            // Display total objects count.
+            Console.WriteLine("Total exported object(s) : " + totalObjectsCount + ".");
         }
 
         #endregion
