@@ -11,7 +11,7 @@ namespace WC2TB
         private const string Extension = ".txt";
         private const int TBOffset = 200000;
 
-        private static string Directory;
+        private static string directory;
 
         #region Main
 
@@ -34,7 +34,7 @@ namespace WC2TB
                 return;
 
             // Get the XML directory for export destination.
-            Directory = Path.GetDirectoryName(args[0]);
+            directory = Path.GetDirectoryName(args[0]);
 
             // Process objects data.
             ExportObjects(in xml);
@@ -66,7 +66,7 @@ namespace WC2TB
             foreach (XmlElement layer in layers)
             {
                 // Open a file stream per World Creator layer.
-                string path = Directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
+                string path = directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
 
                 using (StreamWriter file = new StreamWriter(path))
                 {
