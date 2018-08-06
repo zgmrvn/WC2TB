@@ -12,6 +12,8 @@ namespace WC2TB
         private const int TBOffset = 200000;
 
         private static string directory;
+        private static int totalObjectsCount = 0;
+        private static int layerObjectsCount = 0;
 
         #region Main
 
@@ -36,8 +38,15 @@ namespace WC2TB
             // Get the XML directory for export destination.
             directory = Path.GetDirectoryName(args[0]);
 
-            // Process objects data.
-            ExportObjects(in xml);
+            // Find layers.
+            XmlNodeList objectElements = xml.GetElementsByTagName("Objects");
+            XmlNode objects = objectElements[0];
+            XmlNode layers = objects.ChildNodes[0];
+
+            // Process Layers.
+            Layers(in layers);
+
+            Console.WriteLine("Total exported object(s) : " + totalObjectsCount + ".");
 
             Console.WriteLine("Press ENTER to exit.");
             Console.ReadLine();
@@ -45,88 +54,86 @@ namespace WC2TB
 
         #endregion
 
-        #region Export objects
+        #region Layers
 
         /// <summary>
-        /// Processes World Creator's projet and exports data in a Terrain Builder compatible format.
+        /// Iterates througth World Creator's layers.
         /// </summary>
-        /// <param name="xml"></param>
-        private static void ExportObjects(in XmlDocument xml)
+        /// <param name="layers"></param>
+        private static void Layers(in XmlNode layers)
         {
-            // Find layers.
-            XmlNodeList objectElements = xml.GetElementsByTagName("Objects");
-            XmlNode objects = objectElements[0];
-            XmlNode layers = objects.ChildNodes[0];
-
-            // objects count
-            int totalObjectsCount = 0;
-            int layerObjectsCount = 0;
-
-            // Iterate throught layers.
             foreach (XmlElement layer in layers)
             {
                 // Open a file stream per World Creator layer.
                 string path = directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
+                var stream = new StreamWriter(path);
 
-                using (StreamWriter file = new StreamWriter(path))
-                {
-                    // Iterate throught each object of the current layer.
-                    foreach (XmlElement obj in layer.ChildNodes)
-                    {
-                        //string objName = obj.GetAttribute("Name");
-                        string tag = obj.GetAttribute("Tag");
+                // process objects.
+                Objects(in layer, in stream);
 
-                        // Extract encoded objects data.
-                        string dataString = obj.InnerText;
-                        string dataCountString = obj.ChildNodes[0].Attributes["DataCount"].Value;
-
-                        if (int.TryParse(dataCountString, out int dataCount))
-                        {
-                            const int elementCount = 9;
-                            var data = Convert.FromBase64String(dataString);
-                            var objectData = new float[dataCount * elementCount];
-                            Buffer.BlockCopy(data, 0, objectData, 0, dataCount * elementCount * 4);
-
-                            for (int i = 0; i < dataCount; i++)
-                            {
-                                int off = i * elementCount;
-
-                                // Extract rotation.
-                                var quaternion = new Quaternion(objectData[off + 5], objectData[off + 6], objectData[off + 7], objectData[off + 8]);
-                                quaternion = YUpToZUp(quaternion);
-                                Vector3 angles = GetTerrainBuilderAngles(quaternion);
-
-                                // Prepare final data.
-                                string posX = (objectData[off] + TBOffset).ToString("F");
-                                string posY = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
-                                string posZ = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
-                                string rotX = angles.X.ToString(CultureInfo.InvariantCulture);
-                                string rotY = angles.Y.ToString(CultureInfo.InvariantCulture);
-                                string rotZ = angles.Z.ToString(CultureInfo.InvariantCulture);
-                                string scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
-
-                                // x and y disabled
-                                rotX = "0";
-                                rotY = "0";
-
-                                // yaw (y), pitch (x), roll (z)
-                                string entry = $"\"{tag}\";{posX};{posY};{rotZ};{rotX};{rotY};{scale};{posZ};";
-
-                                file.WriteLine(entry);
-                                layerObjectsCount++;
-                            }
-                        }
-                    }
-                }
+                stream.Close();
 
                 // Display layer's objects count.
                 Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported : " + layerObjectsCount + " object(s).");
+
                 totalObjectsCount += layerObjectsCount;
                 layerObjectsCount = 0;
             }
+        }
 
-            // Display total objects count.
-            Console.WriteLine("Total exported object(s) : " + totalObjectsCount + ".");
+        #endregion
+
+        #region Objects
+
+        /// <summary>
+        /// Exports objects of the passed layer to the passed steam in a Terrain Builder compatible format.
+        /// </summary>
+        /// <param name="layer"></param>
+        /// <param name="stream"></param>
+        private static void Objects(in XmlElement layer, in StreamWriter stream)
+        {
+            // Iterate throught each object of the current layer.
+            foreach (XmlElement obj in layer.ChildNodes)
+            {
+                string tag = obj.GetAttribute("Tag");
+
+                // Extract encoded objects data.
+                string dataString = obj.InnerText;
+                string dataCountString = obj.ChildNodes[0].Attributes["DataCount"].Value;
+
+                if (int.TryParse(dataCountString, out int dataCount))
+                {
+                    const int elementCount = 9;
+                    var data = Convert.FromBase64String(dataString);
+                    var objectData = new float[dataCount * elementCount];
+                    Buffer.BlockCopy(data, 0, objectData, 0, dataCount * elementCount * 4);
+
+                    for (int i = 0; i < dataCount; i++)
+                    {
+                        int off = i * elementCount;
+
+                        // Extract rotation.
+                        var quaternion = new Quaternion(objectData[off + 5], objectData[off + 6], objectData[off + 7], objectData[off + 8]);
+                        quaternion = YUpToZUp(quaternion);
+                        Vector3 angles = GetTerrainBuilderAngles(quaternion);
+
+                        // Prepare final data.
+                        string posX = (objectData[off] + TBOffset).ToString("F");
+                        string posY = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
+                        string posZ = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
+                        string rotX = angles.X.ToString(CultureInfo.InvariantCulture);
+                        string rotY = angles.Y.ToString(CultureInfo.InvariantCulture);
+                        string rotZ = angles.Z.ToString(CultureInfo.InvariantCulture);
+                        string scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
+
+                        // yaw (y), pitch (x), roll (z)
+                        string entry = $"\"{tag}\";{posX};{posY};{rotZ};{rotX};{rotY};{scale};{posZ};";
+
+                        stream.WriteLine(entry);
+                        layerObjectsCount++;
+                    }
+                }
+            }       
         }
 
         #endregion
