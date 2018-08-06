@@ -3,7 +3,6 @@ using System.Globalization;
 using System.IO;
 using System.Numerics;
 using System.Xml;
-using Extensions;
 
 namespace WC2TB
 {
