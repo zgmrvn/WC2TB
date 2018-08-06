@@ -125,5 +125,79 @@ namespace WC2TB
         }
 
         #endregion
+
+        #region Y-Up to Z-Up
+
+        /// <summary>
+        /// Transforms a Quaternion in Unity coordinate space
+        /// to a Quaternion in Arma coordinate space.
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        private static Quaternion YUpToZUp(Quaternion quaternion)
+        {
+            Matrix4x4 matrix = Matrix4x4.CreateFromQuaternion(quaternion);
+
+            var permutation = new Matrix4x4(
+                1, 0, 0, 0,
+                0, 0, 1, 0,
+                0, 1, 0, 0,
+                0, 0, 0, 1
+            );
+
+            return Quaternion.CreateFromRotationMatrix(permutation * matrix);
+        }
+
+        #endregion
+
+        #region GetTerrainBuilderAngles
+
+        /// <summary>
+        /// Takes a Quaternion and returns Terrain Builder compatible angles. 
+        /// </summary>
+        /// <param name="rotation"></param>
+        /// <returns></returns>
+        private static Vector3 GetTerrainBuilderAngles(Quaternion quaternion)
+        {
+            Vector3 dir = Vector3.Transform(Vector3.UnitY, quaternion);
+            Vector3 up = Vector3.Transform(Vector3.UnitZ, quaternion);
+            Vector3 aside = Vector3.Cross(dir, up);
+
+            double xRot, yRot, zRot;
+
+            if (Math.Abs(up.Y) < 0.999f)
+            {
+                xRot = -Math.Asin(up.Y);
+
+                double signCosX = (Math.Cos(xRot) < 0f) ? -1 : 1;
+
+                yRot = Math.Atan2(up.X * signCosX, up.Z * signCosX);
+                zRot = Math.Atan2(-aside.Y * signCosX, dir.Y * signCosX);
+            }
+
+            else
+            {
+                zRot = 0f;
+
+                if (up.Y < 0f)
+                {
+                    xRot = Math.PI * 90f / 180f;
+                    yRot = Math.Atan2(dir.X, dir.Z);
+                }
+
+                else
+                {
+                    xRot = Math.PI * -90f / 180f;
+                    yRot = Math.Atan2(-dir.X, -dir.Z);
+                }
+            }
+
+            // Rad to deg.
+            Vector3 rotation = 180f * new Vector3((float)xRot, (float)yRot, (float)zRot) / (float)Math.PI;
+
+            return rotation;
+        }
+
+        #endregion
     }
 }
