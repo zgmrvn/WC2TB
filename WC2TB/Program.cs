@@ -37,7 +37,7 @@ namespace WC2TB
             Directory = Path.GetDirectoryName(args[0]);
 
             // Process objects data.
-            ExportObjects(ref xml);
+            ExportObjects(in xml);
 
             Console.WriteLine("Press ENTER to exit.");
             Console.ReadLine();
@@ -47,11 +47,11 @@ namespace WC2TB
 
         #region Export objects
 
-        /**
-         * Processes World Creator's projet and exports data
-         * in a Terrain Builder compatible format.
-         */
-        private static void ExportObjects(ref XmlDocument xml)
+        /// <summary>
+        /// Processes World Creator's projet and exports data in a Terrain Builder compatible format.
+        /// </summary>
+        /// <param name="xml"></param>
+        private static void ExportObjects(in XmlDocument xml)
         {
             // Find layers.
             XmlNodeList objectElements = xml.GetElementsByTagName("Objects");
@@ -93,19 +93,24 @@ namespace WC2TB
 
                                 // Extract rotation.
                                 var quaternion = new Quaternion(objectData[off + 5], objectData[off + 6], objectData[off + 7], objectData[off + 8]);
-                                Vector3 euler = quaternion.Euler();
+                                quaternion = YUpToZUp(quaternion);
+                                Vector3 angles = GetTerrainBuilderAngles(quaternion);
 
                                 // Prepare final data.
-                                string posX = (objectData[off] + TBOffset).ToString(CultureInfo.InvariantCulture);
+                                string posX = (objectData[off] + TBOffset).ToString("F");
                                 string posY = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
                                 string posZ = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
-                                string rotY = euler.Y.ToString(CultureInfo.InvariantCulture);
-                                string rotX = euler.X.ToString(CultureInfo.InvariantCulture);
-                                string rotZ = euler.Z.ToString(CultureInfo.InvariantCulture);
+                                string rotX = angles.X.ToString(CultureInfo.InvariantCulture);
+                                string rotY = angles.Y.ToString(CultureInfo.InvariantCulture);
+                                string rotZ = angles.Z.ToString(CultureInfo.InvariantCulture);
                                 string scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
 
-                                // model, x, y, yaw (x), pitch (y), roll (z), scale, z
-                                string entry = $"\"{tag}\";{posX};{posY};{rotY};{rotX};{rotZ};{scale};{posZ};";
+                                // x and y disabled
+                                rotX = "0";
+                                rotY = "0";
+
+                                // yaw (y), pitch (x), roll (z)
+                                string entry = $"\"{tag}\";{posX};{posY};{rotZ};{rotX};{rotY};{scale};{posZ};";
 
                                 file.WriteLine(entry);
                                 layerObjectsCount++;
