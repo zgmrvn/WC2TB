@@ -48,24 +48,6 @@ namespace WC2TB
             XmlNode layers = objects.ChildNodes[0];
 
             // Process Layers.
-            Layers(in layers);
-
-            Console.WriteLine(Strings.TotalExportedObjects, totalObjectsCount.ToString("N0"));
-
-            Console.WriteLine(Strings.Exit);
-            Console.ReadLine();
-        }
-
-        #endregion
-
-        #region Layers
-
-        /// <summary>
-        /// Creates a threaded task for each World Creator's layers.
-        /// </summary>
-        /// <param name="layers"></param>
-        private static void Layers(in XmlNode layers)
-        {
             Task[] taskArray = new Task[layers.ChildNodes.Count];
 
             for (int i = 0; i < taskArray.Length; i++)
@@ -75,6 +57,11 @@ namespace WC2TB
             }
 
             Task.WaitAll(taskArray);
+
+            Console.WriteLine(Strings.TotalExportedObjects, totalObjectsCount.ToString("N0"));
+
+            Console.WriteLine(Strings.Exit);
+            Console.ReadLine();
         }
 
         #endregion
