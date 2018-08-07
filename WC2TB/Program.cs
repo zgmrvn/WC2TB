@@ -47,7 +47,7 @@ namespace WC2TB
             // Process Layers.
             Layers(in layers);
 
-            Console.WriteLine("Total exported object(s) : " + totalObjectsCount + ".");
+            Console.WriteLine("Total exported object(s) : {0}.", totalObjectsCount.ToString("N0"));
 
             Console.WriteLine("Press ENTER to exit.");
             Console.ReadLine();
@@ -94,7 +94,12 @@ namespace WC2TB
             stream.Close();
 
             // Display layer's objects count.
-            Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported : " + layerObjectsCount + " object(s) on thread #" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine(
+                "Thread #{0} | Layer {1} exported : {2} object(s).",
+                Thread.CurrentThread.ManagedThreadId,
+                layer.GetAttribute("Name"),
+                layerObjectsCount.ToString("N0")
+            );
 
             totalObjectsCount += layerObjectsCount;
         }
