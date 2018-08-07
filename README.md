@@ -9,7 +9,7 @@ Simply drag and drop your `SyncTool.xml` file on `WC2TB.exe`, the program will p
 ![How it works](https://media.githubusercontent.com/media/zgmrvn/WC2TB/master/readme/drag-and-drop.gif "How it works")
 
 # Known issue
-Curently, only the Yaw rotation works.
+Currently, only the Yaw rotation works.
 
 # Credit
 Thanks to the Arma's Discord community for help and support.
