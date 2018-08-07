@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.IO;
 using System.Numerics;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace WC2TB
@@ -13,7 +15,6 @@ namespace WC2TB
 
         private static string directory;
         private static int totalObjectsCount = 0;
-        private static int layerObjectsCount = 0;
 
         #region Main
 
@@ -57,28 +58,45 @@ namespace WC2TB
         #region Layers
 
         /// <summary>
-        /// Iterates througth World Creator's layers.
+        /// Creates a threaded task for each World Creator's layers.
         /// </summary>
         /// <param name="layers"></param>
         private static void Layers(in XmlNode layers)
         {
-            foreach (XmlElement layer in layers)
+            Task[] taskArray = new Task[layers.ChildNodes.Count];
+
+            for (int i = 0; i < taskArray.Length; i++)
             {
-                // Open a file stream per World Creator layer.
-                string path = directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
-                var stream = new StreamWriter(path);
-
-                // process objects.
-                Objects(in layer, in stream);
-
-                stream.Close();
-
-                // Display layer's objects count.
-                Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported : " + layerObjectsCount + " object(s).");
-
-                totalObjectsCount += layerObjectsCount;
-                layerObjectsCount = 0;
+                var layer = layers.ChildNodes[i] as XmlElement;
+                taskArray[i] = Task.Run(delegate { Layer(layer); });
             }
+
+            Task.WaitAll(taskArray);
+        }
+
+        #endregion
+
+        #region Layer
+
+        /// <summary>
+        /// Creates a file steam and exports layers' objects.
+        /// </summary>
+        /// <param name="layer"></param>
+        private static void Layer(XmlElement layer)
+        {
+            // Open a new file stream.
+            string path = directory + Path.DirectorySeparatorChar + layer.GetAttribute("Name") + Extension;
+            var stream = new StreamWriter(path);
+
+            // process objects.
+            int layerObjectsCount = Objects(in layer, in stream);
+
+            stream.Close();
+
+            // Display layer's objects count.
+            Console.WriteLine("Layer " + layer.GetAttribute("Name") + " exported : " + layerObjectsCount + " object(s) on thread #" + Thread.CurrentThread.ManagedThreadId);
+
+            totalObjectsCount += layerObjectsCount;
         }
 
         #endregion
@@ -86,12 +104,14 @@ namespace WC2TB
         #region Objects
 
         /// <summary>
-        /// Exports objects of the passed layer to the passed steam in a Terrain Builder compatible format.
+        /// Exports objects of the passed layer to the passed stream in a Terrain Builder compatible format.
         /// </summary>
         /// <param name="layer"></param>
         /// <param name="stream"></param>
-        private static void Objects(in XmlElement layer, in StreamWriter stream)
+        private static int Objects(in XmlElement layer, in StreamWriter stream)
         {
+            int layerObjectsCount = 0;
+
             // Iterate throught each object of the current layer.
             foreach (XmlElement obj in layer.ChildNodes)
             {
@@ -133,7 +153,9 @@ namespace WC2TB
                         layerObjectsCount++;
                     }
                 }
-            }       
+            }
+
+            return layerObjectsCount;
         }
 
         #endregion
