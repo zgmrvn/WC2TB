@@ -39,6 +39,9 @@ namespace WC2TB
             // Get the XML directory for export destination.
             directory = Path.GetDirectoryName(args[0]);
 
+            // Get current culture for localization.
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.CurrentCulture;
+
             // Find layers.
             XmlNodeList objectElements = xml.GetElementsByTagName("Objects");
             XmlNode objects = objectElements[0];
@@ -47,9 +50,9 @@ namespace WC2TB
             // Process Layers.
             Layers(in layers);
 
-            Console.WriteLine("Total exported object(s) : {0}.", totalObjectsCount.ToString("N0"));
+            Console.WriteLine(Strings.TotalExportedObjects, totalObjectsCount.ToString("N0"));
 
-            Console.WriteLine("Press ENTER to exit.");
+            Console.WriteLine(Strings.Exit);
             Console.ReadLine();
         }
 
@@ -95,7 +98,7 @@ namespace WC2TB
 
             // Display layer's objects count.
             Console.WriteLine(
-                "Thread #{0} | Layer {1} exported : {2} object(s).",
+                Strings.ExportedLayer,
                 Thread.CurrentThread.ManagedThreadId,
                 layer.GetAttribute("Name"),
                 layerObjectsCount.ToString("N0")
