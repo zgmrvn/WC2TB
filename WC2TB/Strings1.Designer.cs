@@ -70,7 +70,7 @@ namespace WC2TB {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Thread #{0} | Layer {1} exported : {2} object(s)..
+        ///   Recherche une chaîne localisée semblable à Layer &quot;{0}&quot; exported : {1} object(s)..
         /// </summary>
         public static string ExportedLayer {
             get {
