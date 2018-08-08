@@ -15,6 +15,8 @@ WC2TB is a small program that let you convert objects data from a World Creator 
 
 ![How it works](https://media.githubusercontent.com/media/zgmrvn/WC2TB/master/readme/drag-and-drop.gif "How it works")
 
+4. You now have `.txt` files of objects ready to be imported in Terrain Builder.
+
 # Known issue
 Currently, only the Yaw rotation works.
 
