@@ -141,7 +141,7 @@ namespace WC2TB
                         Vector3 angles = GetTerrainBuilderAngles(quaternion);
 
                         // Prepare final data.
-                        string posX = (objectData[off] + TBOffset).ToString("F");
+                        string posX = (objectData[off] + TBOffset).ToString(CultureInfo.InvariantCulture);
                         string posY = objectData[off + 2].ToString(CultureInfo.InvariantCulture);
                         string posZ = objectData[off + 1].ToString(CultureInfo.InvariantCulture);
                         string rotX = angles.X.ToString(CultureInfo.InvariantCulture);
