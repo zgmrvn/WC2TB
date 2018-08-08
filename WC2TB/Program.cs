@@ -141,6 +141,11 @@ namespace WC2TB
                         string rotZ = angles.Z.ToString(CultureInfo.InvariantCulture);
                         string scale = objectData[off + 4].ToString(CultureInfo.InvariantCulture);
 
+                        // Temporary disabling X and Y.
+                        rotZ = rotY;
+                        rotX = "0";
+                        rotY = "0";
+
                         // yaw (y), pitch (x), roll (z)
                         string entry = $"\"{tag}\";{posX};{posY};{rotZ};{rotX};{rotY};{scale};{posZ};";
 
@@ -169,8 +174,8 @@ namespace WC2TB
 
             var permutation = new Matrix4x4(
                 1, 0, 0, 0,
-                0, 0, 1, 0,
                 0, 1, 0, 0,
+                0, 0, 1, 0,
                 0, 0, 0, 1
             );
 
