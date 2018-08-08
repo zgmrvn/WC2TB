@@ -121,7 +121,7 @@
     <value>Appyez sur ENTRER pour quitter.</value>
   </data>
   <data name="ExportedLayer" xml:space="preserve">
-    <value>Thread #{0} | Calque {1} exporté : {2} objet(s).</value>
+    <value>Calque "{0}" exporté : {1} objet(s).</value>
   </data>
   <data name="TotalExportedObjects" xml:space="preserve">
     <value>Nombre total d'objet(s) exporté(s) : {0}.</value>

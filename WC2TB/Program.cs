@@ -83,13 +83,21 @@ namespace WC2TB
 
             stream.Close();
 
-            // Display layer's objects count.
-            Console.WriteLine(
-                Strings.ExportedLayer,
-                Thread.CurrentThread.ManagedThreadId,
-                layer.GetAttribute("Name"),
-                layerObjectsCount.ToString("N0")
-            );
+            #if DEBUG
+                Console.WriteLine(
+                    "Thread #{2} | " + Strings.ExportedLayer,
+                    layer.GetAttribute("Name"),
+                    layerObjectsCount.ToString("N0"),
+                    Thread.CurrentThread.ManagedThreadId
+                );
+            #else
+                // Display layer's objects count.
+                Console.WriteLine(
+                    Strings.ExportedLayer,
+                    layer.GetAttribute("Name"),
+                    layerObjectsCount.ToString("N0")
+                );
+            #endif
 
             totalObjectsCount += layerObjectsCount;
         }

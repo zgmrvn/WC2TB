@@ -121,7 +121,7 @@
     <value>Press ENTER to exit.</value>
   </data>
   <data name="ExportedLayer" xml:space="preserve">
-    <value>Thread #{0} | Layer {1} exported : {2} object(s).</value>
+    <value>Layer "{0}" exported : {1} object(s).</value>
   </data>
   <data name="TotalExportedObjects" xml:space="preserve">
     <value>Total exported object(s) : {0}.</value>
